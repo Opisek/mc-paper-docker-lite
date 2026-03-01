@@ -2,7 +2,7 @@
 
 The simplest way to host a PaperMC Minecraft server using Docker.
 
-1. Install [https://docs.docker.com/engine/install/](Docker)
+1. Install [Docker](https://docs.docker.com/engine/install/)
 2. Create a file called `docker-compose.yml` and paste the following example:
   ```yml
 services:
