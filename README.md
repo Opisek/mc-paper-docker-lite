@@ -17,7 +17,6 @@ services:
         - EULA=false      # change this to true if you agree to minecraft eula https://www.minecraft.net/en-us/eula
         - VERSION=latest  # minecraft version or "latest"
         - CHANNEL=default # change this to "experimental" for preview paper builds
-        - GRACE=180       # amount of time in seconds of nobody being online before stopping the server
         - XMS=8G          # minimum amount of ram to allocate to the server
         - XMX=8G          # maximum amount of ram to allocate to the server
         - UID=9999        # minecraft files user id
