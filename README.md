@@ -28,7 +28,55 @@ services:
         dockerfile: Dockerfile
   ```
 3. Adjust the settings as needed. In particular, you can set `VERSION` to whichever you want to play on, for example `1.21.11`. Futhermore, to run a Minecraft server, you must agree to [EULA](https://www.minecraft.net/en-us/eula) and set `EULA` to `true`.
-4. Run `docker compose up -d`
-5. Done! You can now connect to your Minecraft server. The next step is usually to adjust your `server.properties` file.
-6. If you wish to access the server console, you can do so by running `docker attach minecraft`.
-7. You can shut the server down by running `docker compose down` or restart it by running `docker compose restart`. Whenever the server starts up, the latest update (respecting the selected Minecraft version) is automatically installed.
+
+  For an explanation of the variables, consult the following table:
+
+  Variable|Meaning
+  -|-
+  `EULA` | Should be `true` if you agree to [Minecraft's EULA](https://www.minecraft.net/en-us/eula)
+  `VERSION` | The minecraft version that should be installed, e.g. `1.20.1` or `latest` for the most current version
+  `CHANNEL` | The channel for PaperMC builds to be used: `default` for normal builds and `experimental` for potentally unstable builds
+  `XMS` | The minimum amount of RAM to allocate to the minecraft server
+  `XMX` | The maximum amount of RAM to allocate to the minecraft server
+  `UID` | The user id to use for the server files
+  `GID` | The group id to use for the server files
+
+4. Adjust the mount point for minecraft files in the `docker-compose.yml` file.
+
+  For example, if you want your minecraft files to be on your Desktop and you're using Windows,
+  you should adjust the corresponding line to
+  ```yml
+  - "C:/Users/Username/Desktop/minecraft:/app/minecraft"
+  ```
+
+  If you are using Linux, adjusting the path is simple, for example:
+  ```yml
+  - "/home/username/minecraft:/app/minecraft"
+  ```
+
+5. Open the directory with the `docker-compose.yml` file and run
+  ```bash
+  docker-compose up . -d
+  ```
+
+6. Run the following command to view the server console
+  ```bash
+  docker attach minecraft 
+  ```
+
+7. Once the server has booted up, make sure to add yourself to the list of operators
+  ```bash
+  op Username 
+  ```
+
+8. Done! You can now connect to your Minecraft server. The next step is usually to adjust your `server.properties` file.
+9. You can shut the server down by running
+  ```bash
+  docker compose down
+  ```
+  or restart it by running
+  ```bash
+  docker compose restart
+  ```
+
+  Whenever the server starts up, the latest update (respecting the selected Minecraft version) is automatically installed.
