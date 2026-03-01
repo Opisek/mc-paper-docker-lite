@@ -68,7 +68,8 @@ echo "Selected version $VERSION build $BUILD"
 
 if [ ! -f "./minecraft/${FILENAME}" ]; then
   echo "Downloading $FILENAME"
-  (cd ./minecraft && rm *.jar && curl -OsL "https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD}/downloads/${FILENAME}")
+  (cd ./minecraft && rm *.jar 2> /dev/null)
+  (cd ./minecraft && curl -OsL "https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD}/downloads/${FILENAME}")
 else
   echo "Binary already installed, nothing to update"
 fi
