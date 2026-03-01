@@ -11,7 +11,6 @@ services:
       image: opisek/mc-paper-docker-lite:latest
       volumes:
         - /srv/minecraft:/app/minecraft # change /srv/minecraft to the directory you want to store minecraft files in
-        - minecraft-data:/app/data
       network_mode: host
       environment:
         - EULA=false      # change this to true if you agree to minecraft eula https://www.minecraft.net/en-us/eula
