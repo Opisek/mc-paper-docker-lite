@@ -29,7 +29,7 @@ if [ "$PAPER_VERSIONS" = null ]; then
   echo "Could not connect to PaperMC API"
 fi
 
-if [ "${VERSION:=latest}" = latest ]; then
+if [ "${VERSION:=LATEST}" = LATEST ]; then
    while read VERSION; do
     PAPER_BUILDS=`curl -sL -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/paper/versions/${VERSION}/builds | jq '[ .[] | {build: .id, channel: .channel, download: .downloads."server:default"}]'`
     if [ "${CHANNEL:=STABLE}" == STABLE ]; then

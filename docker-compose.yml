@@ -8,8 +8,8 @@ services:
       - 25565:25565
     environment:
       - EULA=true      # change this to true if you agree to minecraft eula https://www.minecraft.net/en-us/eula
-      - VERSION=latest  # minecraft version or "latest"
-      - CHANNEL=default # change this to "experimental" for preview paper builds
+      - VERSION=LATEST  # minecraft version or "LATEST"
+      - CHANNEL=STABLE  # "STABLE", "BETA" or "ALPHA" for corresponding papermc builds
       - XMS=8G          # minimum amount of ram to allocate to the server
       - XMX=8G          # maximum amount of ram to allocate to the server
       - MC_UID=9999     # minecraft files user id
