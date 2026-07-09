@@ -66,7 +66,6 @@ else
     echo "Unknown channel $CHANNEL"
     exit 1
   fi
-  echo $PAPER_BUILDS
   FILENAME=`echo $PAPER_BUILDS | jq -r '.[0].download.name'`
   URL=`echo $PAPER_BUILDS | jq -r '.[0].download.url'`
   HASH=`echo $PAPER_BUILDS | jq -r '.[0].download.checksums.sha256'`
