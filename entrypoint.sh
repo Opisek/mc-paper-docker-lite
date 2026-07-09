@@ -21,7 +21,9 @@ fi
 # Find appropriate binary
 echo "Checking for updates"
 
-PAPER_VERSIONS=`curl -sL https://api.papermc.io/v2/projects/paper | jq '.versions'`
+USER_AGENT="mc-paper-docker-lite/2.0.0 (github.com/Opisek/mc-paper-docker-lite)"
+
+PAPER_VERSIONS=`curl -sL -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/paper | jq '.versions | add | reverse'`
 
 if [ "$PAPER_VERSIONS" = null ]; then
   echo "Could not connect to PaperMC API"
@@ -29,12 +31,20 @@ fi
 
 if [ "${VERSION:=latest}" = latest ]; then
    while read VERSION; do
-    PAPER_BUILDS=`curl -sL https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds | jq '[.builds | reverse | .[] | {build: .build, channel: .channel, download: .downloads.application}]'`
-    if [ "${CHANNEL:=default}" != experimental ]; then
-      PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="default")]'`
+    PAPER_BUILDS=`curl -sL -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/paper/versions/${VERSION}/builds | jq '[ .[] | {build: .id, channel: .channel, download: .downloads."server:default"}]'`
+    if [ "${CHANNEL:=STABLE}" == STABLE ]; then
+      PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE")]'`
+    elif [ "${CHANNEL:=STABLE}" == BETA ]; then
+      PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE" or .channel=="BETA")]'`
+    elif [ "${CHANNEL:=STABLE}" == ALPHA ]; then
+      PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE" or .channel=="BETA" or .channel=="ALPHA")]'`
+    else
+      echo "Unknown channel $CHANNEL"
+      exit 1
     fi
     FILENAME=`echo $PAPER_BUILDS | jq -r '.[0].download.name'`
-    HASH=`echo $PAPER_BUILDS | jq -r '.[0].download.sha256'`
+    URL=`echo $PAPER_BUILDS | jq -r '.[0].download.url'`
+    HASH=`echo $PAPER_BUILDS | jq -r '.[0].download.checksums.sha256'`
     BUILD=`echo $PAPER_BUILDS | jq -r '.[0].build'`
     if [ $BUILD != null ]; then
       break
@@ -45,12 +55,21 @@ else
     echo "PaperMC does not offer binaries for version $VERSION"
     exit 1
   fi
-  PAPER_BUILDS=`curl -sL https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds | jq '[.builds | reverse | .[] | {build: .build, channel: .channel, download: .downloads.application}]'`
-  if [ "${CHANNEL:=default}" != experimental ]; then
-    PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="default")]'`
+  PAPER_BUILDS=`curl -sL -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/paper/versions/${VERSION}/builds | jq '[ .[] | {build: .id, channel: .channel, download: .downloads."server:default"}]'`
+  if [ "${CHANNEL:=STABLE}" == STABLE ]; then
+    PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE")]'`
+  elif [ "${CHANNEL:=STABLE}" == BETA ]; then
+    PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE" or .channel=="BETA")]'`
+  elif [ "${CHANNEL:=STABLE}" == ALPHA ]; then
+    PAPER_BUILDS=`echo $PAPER_BUILDS | jq '[.[] | select(.channel=="STABLE" or .channel=="BETA" or .channel=="ALPHA")]'`
+  else
+    echo "Unknown channel $CHANNEL"
+    exit 1
   fi
+  echo $PAPER_BUILDS
   FILENAME=`echo $PAPER_BUILDS | jq -r '.[0].download.name'`
-  HASH=`echo $PAPER_BUILDS | jq -r '.[0].download.sha256'`
+  URL=`echo $PAPER_BUILDS | jq -r '.[0].download.url'`
+  HASH=`echo $PAPER_BUILDS | jq -r '.[0].download.checksums.sha256'`
   BUILD=`echo $PAPER_BUILDS | jq -r '.[0].build'`
 fi
 
@@ -68,8 +87,8 @@ echo "Selected version $VERSION build $BUILD"
 
 if [ ! -f "./minecraft/${FILENAME}" ]; then
   echo "Downloading $FILENAME"
-  (cd ./minecraft && rm *.jar 2> /dev/null)
-  (cd ./minecraft && curl -OsL "https://api.papermc.io/v2/projects/paper/versions/${VERSION}/builds/${BUILD}/downloads/${FILENAME}")
+  (cd ./minecraft && rm *.jar 2> /dev/null) || true
+  (cd ./minecraft && curl -OsL -H "User-Agent: $USER_AGENT" "${URL}")
 else
   echo "Binary already installed, nothing to update"
 fi
